@@ -47,6 +47,19 @@ struct SettingsView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 HStack {
+                    Text("Display Duration")
+                    Text("\(appState.toastDisplaySecond, specifier: "%.2f")")
+                        .opacity(0.8)
+                    Divider()
+                    Slider(value: $appState.toastDisplaySecond, in: 0.0...10) {
+                    } minimumValueLabel: {
+                        Text("0")
+                    } maximumValueLabel: {
+                        Text("10")
+                    }
+                    .controlSize(.mini)
+                }
+                HStack {
                     Text("Opacity")
                     Text("\(appState.toastOpacity * 100, specifier: "%.0f")")
                         .opacity(0.8)
@@ -157,6 +170,9 @@ struct SettingsView: View {
                     }
                 }
                 .labelsHidden()
+                .onChange(of: appState.soundName) { _, newValue in
+                    SystemSound.play(name: newValue, volume: appState.soundVolume)
+                }
                 Button("▶︎ Play") {
                     SystemSound.play(name: appState.soundName, volume: appState.soundVolume)
                 }

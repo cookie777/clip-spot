@@ -13,7 +13,7 @@ final class AppState: ObservableObject {
     @AppStorage("toastWidth") var toastWidth: Double = 400
     @AppStorage("toastHeight") var toastHeight: Double = 160
     @AppStorage("toastOpacity") var toastOpacity: Double = 0.9
-    @AppStorage("soundName") var soundName: String = "Pop"
+    @AppStorage("soundName") var soundName: String = "Blow"
     @AppStorage("soundVolume") var soundVolume: Double = 0.5
     @AppStorage("toastBackgroundColorData") private var toastBackgroundColorData: Data?
     @AppStorage("toastTextColorData") private var toastTextColorData: Data?
@@ -21,6 +21,7 @@ final class AppState: ObservableObject {
     @AppStorage("toastFontSize") var toastFontSize: Double = 14
     @AppStorage("toastShowTitle") var toastShowTitle: Bool = true
     @AppStorage("toastShowTitle") var toastShowCopyContent: Bool = true
+    @AppStorage("toastDisplaySecond") var toastDisplaySecond: Double = 1.0
     
     @Published var monitoringEnabled: Bool = true
 

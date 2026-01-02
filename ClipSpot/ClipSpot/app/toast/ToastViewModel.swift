@@ -41,11 +41,11 @@ final class ToastViewModel: ObservableObject {
             volume: Double(appState.soundVolume)
         )
 
-        showWindow(text: text)
+        await showWindow(text: text)
 
-        try? await Task.sleep(nanoseconds: 1_000_000_000)
+        try? await Task.sleep(nanoseconds: UInt64(appState.toastDisplaySecond) * 1_000_000_000)
 
-        hideWindow()
+        await hideWindow()
         showToast = false
     }
 
@@ -68,7 +68,8 @@ final class ToastViewModel: ObservableObject {
         toastWindow = window
     }
 
-    private func showWindow(text: String) {
+    @MainActor
+    private func showWindow(text: String) async {
         createWindowIfNeeded()
 
         guard
@@ -81,24 +82,26 @@ final class ToastViewModel: ObservableObject {
 
         window.makeKeyAndOrderFront(nil)
 
-        NSAnimationContext.runAnimationGroup { context in
-            context.duration = 0.16
-            context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-            window.animator().alphaValue = 1
-        }
+        await animateWindowAlpha(window: window, to: 1, duration: 0.16)
     }
 
-    private func hideWindow() {
+    @MainActor
+    private func hideWindow() async {
         guard let window = toastWindow else { return }
-
-        NSAnimationContext.runAnimationGroup { context in
-            context.duration = 0.24
-            context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-            window.animator().alphaValue = 0
-        } completionHandler: {
-            Task { @MainActor in
-                window.orderOut(nil)
-            }
+        await animateWindowAlpha(window: window, to: 0, duration: 0.24)
+        window.orderOut(nil)
+    }
+    
+    @MainActor
+    private func animateWindowAlpha(window: NSWindow, to alpha: CGFloat, duration: TimeInterval) async {
+        await withCheckedContinuation { continuation in
+            NSAnimationContext.runAnimationGroup({ context in
+                context.duration = duration
+                context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+                window.animator().alphaValue = alpha
+            }, completionHandler: {
+                continuation.resume()
+            })
         }
     }
 
