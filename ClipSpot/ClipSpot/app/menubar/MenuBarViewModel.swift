@@ -23,6 +23,7 @@ final class MenuBarViewModel: ObservableObject {
         } else {
             clipboardService.startMonitoring()
         }
+
         appState.monitoringEnabled.toggle()
         objectWillChange.send()
     }

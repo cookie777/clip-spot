@@ -2,14 +2,17 @@ import SwiftUI
 import AppKit
 import Combine
 
+@MainActor
 final class ToastViewModel: ObservableObject {
 
     @Published var toastText: String = ""
-    @Published var showToast: Bool = false
 
     private let soundService: SoundService
     private let clipboardService: ClipboardService
     private let appState: AppState
+    
+    
+    private var toastTask: Task<Void, Never>?
 
     private var toastWindow: NSWindow?
 
@@ -26,32 +29,42 @@ final class ToastViewModel: ObservableObject {
 
     private func setupClipboardMonitoring() {
         clipboardService.onCopyDetected = { [weak self] text in
-            Task { await self?.displayToast(with: text) }
+            guard let self = self else { return }
+            Task {
+                // Cancel previous task + await so that next animation can be safely start from scratch
+                let previousTask = toastTask
+                previousTask?.cancel()
+                await previousTask?.value
+                
+                toastTask = Task { await displayToast(with: text) }
+            }
         }
         clipboardService.startMonitoring()
     }
 
-    @MainActor
     private func displayToast(with text: String) async {
+        createWindowIfNeeded()
         toastText = text
-        showToast = true
 
-        soundService.playNotificationSound(
+        await soundService.playNotificationSound(
             name: appState.soundName,
             volume: Double(appState.soundVolume)
         )
-
         await showWindow(text: text)
-
+        if Task.isCancelled { // Cancel and return asap with resetting if requrested
+            cancelWindowAnimations(toastWindow)
+            return
+        }
         try? await Task.sleep(nanoseconds: UInt64(appState.toastDisplaySecond) * 1_000_000_000)
-
-        await hideWindow()
-        showToast = false
+        if Task.isCancelled { // Sleep will immidiactly resuem await and land here if cancle requested
+            cancelWindowAnimations(toastWindow)
+            return
+        }
+        await hideWindowIfVisible()
     }
 
     private func createWindowIfNeeded() {
         guard toastWindow == nil else { return }
-
         let hosting = NSHostingController(
             rootView: ToastView(text: "", appState: appState)
         )
@@ -68,10 +81,7 @@ final class ToastViewModel: ObservableObject {
         toastWindow = window
     }
 
-    @MainActor
     private func showWindow(text: String) async {
-        createWindowIfNeeded()
-
         guard
             let window = toastWindow,
             let hosting = window.contentViewController as? NSHostingController<ToastView>
@@ -79,29 +89,28 @@ final class ToastViewModel: ObservableObject {
 
         hosting.rootView = ToastView(text: text, appState: appState)
         positionWindow(window: window)
-
-        window.makeKeyAndOrderFront(nil)
-
+        window.alphaValue = 0
+        window.orderFront(nil)
         await animateWindowAlpha(window: window, to: 1, duration: 0.16)
     }
+    
 
-    @MainActor
-    private func hideWindow() async {
+    private func hideWindowIfVisible() async {
         guard let window = toastWindow else { return }
-        await animateWindowAlpha(window: window, to: 0, duration: 0.24)
+        await animateWindowAlpha(window: window, to: 0, duration: 0.16)
         window.orderOut(nil)
     }
+
     
-    @MainActor
-    private func animateWindowAlpha(window: NSWindow, to alpha: CGFloat, duration: TimeInterval) async {
-        await withCheckedContinuation { continuation in
-            NSAnimationContext.runAnimationGroup({ context in
-                context.duration = duration
-                context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-                window.animator().alphaValue = alpha
-            }, completionHandler: {
-                continuation.resume()
-            })
+    private func animateWindowAlpha(
+        window: NSWindow,
+        to alpha: CGFloat,
+        duration: TimeInterval
+    ) async {
+        await NSAnimationContext.runAnimationGroup { context in
+            context.duration = duration
+            context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            window.animator().alphaValue = alpha
         }
     }
 
@@ -114,10 +123,17 @@ final class ToastViewModel: ObservableObject {
 
         window.setFrameOrigin(NSPoint(x: x, y: y))
     }
+    
+    @MainActor
+    private func cancelWindowAnimations(_ window: NSWindow?) {
+        guard let window = window else { return }
+        window.animator().alphaValue = 0
+    }
 
     deinit {
         Task { @MainActor [weak self] in
             self?.clipboardService.stopMonitoring()
+            print("stop monitoring")
         }
     }
 }

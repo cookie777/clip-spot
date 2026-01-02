@@ -7,11 +7,23 @@
 
 import AppKit
 
-final class SoundService {
+actor SoundService {
+
+    private var currentSound: NSSound?
+
     func playNotificationSound(name: String, volume: Double) {
-        // macOS system sounds are located in /System/Library/Sounds
+        // Stop previous sound if still playing
+        currentSound?.stop()
+
         let sound = NSSound(named: NSSound.Name(name))
         sound?.volume = Float(volume)
         sound?.play()
+
+        currentSound = sound
+    }
+
+    func stopNotificationSound() {
+        currentSound?.stop()
+        currentSound = nil
     }
 }
