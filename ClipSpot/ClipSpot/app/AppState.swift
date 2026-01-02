@@ -10,14 +10,14 @@ import Combine
 
 @MainActor
 final class AppState: ObservableObject {
-    @AppStorage("toastWidth") var toastWidth: Double = 200
-    @AppStorage("toastHeight") var toastHeight: Double = 400
+    @AppStorage("toastWidth") var toastWidth: Double = 400
+    @AppStorage("toastHeight") var toastHeight: Double = 160
     @AppStorage("toastOpacity") var toastOpacity: Double = 0.9
     @AppStorage("soundName") var soundName: String = "Pop"
     @AppStorage("soundVolume") var soundVolume: Double = 0.5
     @AppStorage("toastBackgroundColorData") private var toastBackgroundColorData: Data?
     @AppStorage("toastTextColorData") private var toastTextColorData: Data?
-    @AppStorage("toastMarging") var toastMarging: Double = 12
+    @AppStorage("toastMarging") var toastMarging: Double = 16
     @AppStorage("toastFontSize") var toastFontSize: Double = 14
     @AppStorage("toastShowTitle") var toastShowTitle: Bool = true
     @AppStorage("toastShowTitle") var toastShowCopyContent: Bool = true
@@ -26,7 +26,7 @@ final class AppState: ObservableObject {
 
     var toastBgColor: Color {
         get {
-            Color.fromData(toastBackgroundColorData ?? Data()) ?? .black
+            Color.fromData(toastBackgroundColorData ?? Data()) ?? Color.taostBackground
         }
         set {
             toastBackgroundColorData = newValue.toData()
@@ -36,7 +36,7 @@ final class AppState: ObservableObject {
     
     var toastTextColor: Color {
         get {
-            Color.fromData(toastTextColorData ?? Data()) ?? .white
+            Color.fromData(toastTextColorData ?? Data()) ?? Color.toastText
         }
         set {
             toastTextColorData = newValue.toData()
