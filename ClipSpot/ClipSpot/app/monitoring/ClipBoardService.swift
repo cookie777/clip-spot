@@ -9,7 +9,7 @@
 import AppKit
 import Combine
 
-actor ClipboardService {
+actor ClipboardService: ILogger {
     private let pasteboard = NSPasteboard.general
     private var lastChangeCount = NSPasteboard.general.changeCount
     private var timer: Task<(), Never>?
@@ -24,6 +24,7 @@ actor ClipboardService {
 
     func startMonitoring() {
         guard timer == nil else { return }
+        info("start monitoring")
         timer = Task(priority: .utility) { [weak self] in
             while !Task.isCancelled {
                 guard let self else { return }

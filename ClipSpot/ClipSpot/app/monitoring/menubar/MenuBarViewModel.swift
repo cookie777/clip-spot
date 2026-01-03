@@ -7,11 +7,13 @@
 
 import Combine
 
+@MainActor
 final class MenuBarViewModel: ObservableObject {
     private let clipboardService: ClipboardService
     private let appState: AppState
+
     
-    init(clipboardService: ClipboardService, appState: AppState) {
+    init (clipboardService: ClipboardService, appState: AppState) {
         self.clipboardService = clipboardService
         self.appState = appState
     }

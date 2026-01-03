@@ -2,9 +2,10 @@ import SwiftUI
 import AppKit
 import Combine
 
-final class ToastViewModel: ObservableObject {
+@MainActor
+final class ToastViewModel {
 
-    @Published var toastText: String = ""
+    var toastText: String = ""
 
     private let soundService: SoundService
     private let clipboardService: ClipboardService
@@ -14,19 +15,16 @@ final class ToastViewModel: ObservableObject {
     private var toastWindow: NSWindow?
 
     init(
+        appState: AppState,
         soundService: SoundService,
         clipboardService: ClipboardService,
-        settings: AppState
     ) {
         self.soundService = soundService
         self.clipboardService = clipboardService
-        self.appState = settings
-        Task(priority: .utility) {
-            await setupClipboardMonitoring()
-        }
+        self.appState = appState
     }
 
-    private func setupClipboardMonitoring() async {
+    func setupClipboardMonitoring() async {
         await clipboardService.startMonitoring()
         for await text in await clipboardService.copyPublisher {
             // Cancel previous toast
@@ -118,8 +116,8 @@ final class ToastViewModel: ObservableObject {
         guard let screen = NSScreen.main else { return }
 
         let frame = screen.visibleFrame
-        let x = frame.maxX - appState.toastWidth - appState.toastMarging
-        let y = frame.minY + appState.toastMarging
+        let x = frame.maxX - appState.toastWidth - appState.toastMargin
+        let y = frame.minY + appState.toastMargin
 
         window.setFrameOrigin(NSPoint(x: x, y: y))
     }

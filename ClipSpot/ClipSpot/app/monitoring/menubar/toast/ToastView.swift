@@ -1,5 +1,6 @@
 import SwiftUI
 
+
 struct ToastView: View {
     let text: String
     @ObservedObject var appState: AppState
@@ -21,6 +22,8 @@ struct ToastView: View {
                     .font(.system(size: appState.toastFontSize))
                 Spacer(minLength: 0)
             }
+
+            
         }
         .padding(12)
         .frame(width: appState.toastWidth, height: appState.toastHeight)
