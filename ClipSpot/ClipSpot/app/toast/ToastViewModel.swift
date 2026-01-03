@@ -2,7 +2,6 @@ import SwiftUI
 import AppKit
 import Combine
 
-@MainActor
 final class ToastViewModel: ObservableObject {
 
     @Published var toastText: String = ""
@@ -11,9 +10,7 @@ final class ToastViewModel: ObservableObject {
     private let clipboardService: ClipboardService
     private let appState: AppState
     
-    
     private var toastTask: Task<Void, Never>?
-
     private var toastWindow: NSWindow?
 
     init(
@@ -24,23 +21,26 @@ final class ToastViewModel: ObservableObject {
         self.soundService = soundService
         self.clipboardService = clipboardService
         self.appState = settings
-        setupClipboardMonitoring()
+        Task(priority: .utility) {
+            await setupClipboardMonitoring()
+        }
     }
 
-    private func setupClipboardMonitoring() {
-        clipboardService.onCopyDetected = { [weak self] text in
-            guard let self = self else { return }
-            Task {
-                // Cancel previous task + await so that next animation can be safely start from scratch
-                let previousTask = toastTask
-                previousTask?.cancel()
-                await previousTask?.value
-                
-                toastTask = Task { await displayToast(with: text) }
+    private func setupClipboardMonitoring() async {
+        await clipboardService.startMonitoring()
+        for await text in await clipboardService.copyPublisher {
+            // Cancel previous toast
+            let previousTask = toastTask
+            previousTask?.cancel()
+            await previousTask?.value
+
+            // Start new toast on MainActor
+            toastTask = Task { @MainActor in
+                await displayToast(with: text)
             }
         }
-        clipboardService.startMonitoring()
     }
+
 
     private func displayToast(with text: String) async {
         createWindowIfNeeded()
@@ -124,7 +124,6 @@ final class ToastViewModel: ObservableObject {
         window.setFrameOrigin(NSPoint(x: x, y: y))
     }
     
-    @MainActor
     private func cancelWindowAnimations(_ window: NSWindow?) {
         guard let window = window else { return }
         window.animator().alphaValue = 0
@@ -132,8 +131,7 @@ final class ToastViewModel: ObservableObject {
 
     deinit {
         Task { @MainActor [weak self] in
-            self?.clipboardService.stopMonitoring()
-            print("stop monitoring")
+            await self?.clipboardService.stopMonitoring()
         }
     }
 }

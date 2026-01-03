@@ -7,7 +7,6 @@
 
 import Combine
 
-@MainActor
 final class MenuBarViewModel: ObservableObject {
     private let clipboardService: ClipboardService
     private let appState: AppState
@@ -17,11 +16,11 @@ final class MenuBarViewModel: ObservableObject {
         self.appState = appState
     }
     
-    func flipMonitoring() {
+    func flipMonitoring() async {
         if appState.monitoringEnabled {
-            clipboardService.stopMonitoring()
+            await clipboardService.stopMonitoring()
         } else {
-            clipboardService.startMonitoring()
+            await clipboardService.startMonitoring()
         }
 
         appState.monitoringEnabled.toggle()

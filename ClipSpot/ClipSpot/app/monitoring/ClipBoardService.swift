@@ -9,22 +9,26 @@
 import AppKit
 import Combine
 
-
-final class ClipboardService {
-
+actor ClipboardService {
     private let pasteboard = NSPasteboard.general
     private var lastChangeCount = NSPasteboard.general.changeCount
     private var timer: Task<(), Never>?
 
-    var onCopyDetected: ((String) -> Void)?
+    // AsyncStream for clipboard events
+    private var continuation: AsyncStream<String>.Continuation?
+    var copyPublisher: AsyncStream<String> {
+        AsyncStream { continuation in
+            self.continuation = continuation
+        }
+    }
 
     func startMonitoring() {
-        if timer != nil { return }
+        guard timer == nil else { return }
         timer = Task(priority: .utility) { [weak self] in
             while !Task.isCancelled {
-                  guard let self else { return }
+                guard let self else { return }
                 await self.checkPasteboard()
-                try? await Task.sleep(nanoseconds: UInt64(0.5 * 1_000_000_000))
+                try? await Task.sleep(nanoseconds: 500_000_000) // 0.5s
             }
         }
     }
@@ -38,13 +42,17 @@ final class ClipboardService {
         let current = pasteboard.changeCount
         guard current != lastChangeCount else { return }
         lastChangeCount = current
-        if !isSecuredRecourse(), let text = pasteboard.string(forType: .string), !text.isEmpty {
-            onCopyDetected?(text)
-        } else {
-            onCopyDetected?("")
+
+        guard !isSecuredRecourse(),
+              let text = pasteboard.string(forType: .string),
+              !text.isEmpty else {
+            continuation?.yield("")
+            return
         }
+
+        continuation?.yield(text)
     }
-    
+
     func isSecuredRecourse() -> Bool {
         guard let bundleID = NSWorkspace.shared.frontmostApplication?.bundleIdentifier else {
             return false
@@ -66,38 +74,3 @@ final class ClipboardService {
         return blockedApps.contains(bundleID)
     }
 }
-
-//
-//final class ClipboardService {
-//
-//    private let pasteboard = NSPasteboard.general
-//    private var lastChangeCount = NSPasteboard.general.changeCount
-//    private var timer: Timer?
-//
-//    var onCopyDetected: ((String) -> Void)?
-//
-//    func startMonitoring() {
-//        timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
-////            print(Thread.current)
-//            Task {
-//                await self.checkPasteboard()
-//            }
-//        }
-//        timer?.tolerance = 0.3
-//    }
-//
-//    func stopMonitoring() {
-//        timer?.invalidate()
-//        timer = nil
-//    }
-//
-//    private func checkPasteboard() async {
-//        let current = pasteboard.changeCount
-//        guard current != lastChangeCount else { return }
-//        lastChangeCount = current
-//
-//        if let text = pasteboard.string(forType: .string), !text.isEmpty {
-//            onCopyDetected?(text)
-//        }
-//    }
-//}

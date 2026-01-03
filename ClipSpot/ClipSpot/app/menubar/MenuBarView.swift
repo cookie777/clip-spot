@@ -20,7 +20,9 @@ struct MenuContentView: View {
         Divider()
         
         Button(menuBarViewModel.monitoringLabled) {
-            menuBarViewModel.flipMonitoring()
+            Task {
+                await menuBarViewModel.flipMonitoring()
+            }
         }
         
         Divider()

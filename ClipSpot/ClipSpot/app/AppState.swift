@@ -8,7 +8,6 @@
 import SwiftUI
 import Combine
 
-@MainActor
 final class AppState: ObservableObject {
     @AppStorage("toastWidth") var toastWidth: Double = 400
     @AppStorage("toastHeight") var toastHeight: Double = 160
