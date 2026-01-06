@@ -7,31 +7,31 @@
 
 import Combine
 
-final class MenuBarViewModel: ObservableObject {
+@MainActor
+final class MenuBarViewModel: ObservableObject, ILogger {
     private let clipboardService: ClipboardService
     private let appState: AppState
+
     
-    init(clipboardService: ClipboardService, appState: AppState) {
+    init (clipboardService: ClipboardService, appState: AppState) {
         self.clipboardService = clipboardService
         self.appState = appState
     }
     
-    func flipMonitoring() async {
-        if appState.monitoringEnabled {
-            await clipboardService.stopMonitoring()
-        } else {
+    func updateMonitoring() async {
+        if !appState.monitoringEnabled {
             await clipboardService.startMonitoring()
+        } else {
+            await clipboardService.stopMonitoring()
         }
-
         appState.monitoringEnabled.toggle()
-        objectWillChange.send()
     }
     
-    var monitoringLabled: String {
+    var monitoringLabel: String {
         if appState.monitoringEnabled {
-            return "Disable Copy Alert (Currently ✅Enabled)"
+            return "ClipSpot is active. Click to turn it off"
         } else {
-            return "Enable Copy Alert (Currently 😴Disabled)"
+            return "ClipSpot is not active. Click to turn it on"
         }
     }
 }

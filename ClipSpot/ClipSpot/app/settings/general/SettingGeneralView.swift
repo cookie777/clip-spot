@@ -1,0 +1,44 @@
+//
+//  SettingGeneralView.swift
+//  ClipSpot
+//
+//  Created by Takayuki Yamaguchi on 2026-01-02.
+//
+
+import SwiftUI
+
+struct SettingGeneralView: View {
+    @ObservedObject var appState: AppState
+    @StateObject private var settingGeneralViewModel: SettingGeneralViewModel
+    
+    init(
+        appState: AppState,
+        launchAtLoginService: LaunchAtLoginService
+    ) {
+        self.appState = appState
+        self._settingGeneralViewModel = StateObject(wrappedValue: SettingGeneralViewModel(launchAtLoginService: launchAtLoginService)
+        )
+    }
+    
+    var body: some View {
+        Form {
+            VStack(alignment: .leading) {
+                Toggle("Launched At Login", isOn: $appState.launchAtLogin)
+                    .toggleStyle(.switch)
+                    .onChange(of: appState.launchAtLogin) { _, newValue in
+                        Task {
+                            try? await settingGeneralViewModel.setLaunchAtLogin(newValue)
+                        }
+                    }
+                Text("Enables the app to start automatically when the system boots.")
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .formStyle(.grouped)
+
+    }
+}
+
+#Preview {
+    SettingGeneralView(appState: AppState(), launchAtLoginService: LaunchAtLoginService())
+}
