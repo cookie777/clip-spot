@@ -21,13 +21,21 @@ struct SettingGeneralView: View {
     }
     
     var body: some View {
-        Toggle("Launched At Login", isOn: $appState.launchAtLogin)
-            .toggleStyle(.switch)
-            .onChange(of: appState.launchAtLogin) { _, newValue in
-                Task {
-                    try? await settingGeneralViewModel.setLaunchAtLogin(newValue)
-                }
+        Form {
+            VStack(alignment: .leading) {
+                Toggle("Launched At Login", isOn: $appState.launchAtLogin)
+                    .toggleStyle(.switch)
+                    .onChange(of: appState.launchAtLogin) { _, newValue in
+                        Task {
+                            try? await settingGeneralViewModel.setLaunchAtLogin(newValue)
+                        }
+                    }
+                Text("Enables the app to start automatically when the system boots.")
+                    .foregroundStyle(.secondary)
             }
+        }
+        .formStyle(.grouped)
+
     }
 }
 

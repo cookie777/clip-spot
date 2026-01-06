@@ -35,6 +35,7 @@ actor ClipboardService: ILogger {
     }
 
     func stopMonitoring() {
+        info("stop monitoring")
         timer?.cancel()
         timer = nil
     }

@@ -25,6 +25,7 @@ final class ToastViewModel {
     }
 
     func setupClipboardMonitoring() async {
+        if !appState.monitoringEnabled { return }
         await clipboardService.startMonitoring()
         for await text in await clipboardService.copyPublisher {
             // Cancel previous toast
@@ -49,12 +50,12 @@ final class ToastViewModel {
             volume: Double(appState.soundVolume)
         )
         await showWindow(text: text)
-        if Task.isCancelled { // Cancel and return asap with resetting if requrested
+        if Task.isCancelled { // Cancel and return asap with resetting if requested
             cancelWindowAnimations(toastWindow)
             return
         }
         try? await Task.sleep(nanoseconds: UInt64(appState.toastDisplaySecond) * 1_000_000_000)
-        if Task.isCancelled { // Sleep will immidiactly resuem await and land here if cancle requested
+        if Task.isCancelled { // Sleep will immidiactly resume await and land here if cancel requested
             cancelWindowAnimations(toastWindow)
             return
         }

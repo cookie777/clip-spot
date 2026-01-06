@@ -18,6 +18,7 @@ struct ClipSpotApp: App {
         MenuBarExtra("CopyAlert", systemImage: "doc.on.doc") {
             MenuContentView(appState: appState, diContainer: diContainer)
         }
+//        .menuBarExtraStyle(.window)
 
         Settings {
             SettingsView()

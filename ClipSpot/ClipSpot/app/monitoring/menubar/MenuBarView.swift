@@ -8,6 +8,7 @@ import SwiftUI
 
 struct MenuContentView: View {    
     @Environment(\.openSettings) private var openSettings
+    @ObservedObject var appState: AppState
     @StateObject private var menuBarViewModel: MenuBarViewModel
     private var toastViewModel: ToastViewModel
     
@@ -23,30 +24,37 @@ struct MenuContentView: View {
             soundService: diContainer.soundService,
             clipboardService: diContainer.clipboardService
         )
+        self.appState = appState
         self.toastViewModel = toastViewModel
+        
         Task(priority: .background) {
             await toastViewModel.setupClipboardMonitoring()
         }
     }
     
     var body: some View {
-        Button("Settings") {
-            openSettings()
-            NSApp.activate(ignoringOtherApps: true) // bring app to front
-        }
-
-        Divider()
-        
-        Button(menuBarViewModel.monitoringLabled) {
-            Task {
-                await menuBarViewModel.flipMonitoring()
+            Button("Settings") {
+                openSettings()
+                NSApp.activate(ignoringOtherApps: true) // bring app to front
             }
-        }
-        
-        Divider()
-
-        Button("Quit") {
-            NSApplication.shared.terminate(nil)
-        }
+            Button(menuBarViewModel.monitoringLabel) {
+                Task(priority: .background) {
+                    await menuBarViewModel.updateMonitoring()
+                }
+            }
+            Divider()
+            Button("Quit") {
+                NSApplication.shared.terminate(nil)
+            }
     }
 }
+
+#Preview {
+    VStack {
+        MenuContentView(
+            appState: AppState(),
+            diContainer: DIContainer()
+        )
+    }
+}
+
