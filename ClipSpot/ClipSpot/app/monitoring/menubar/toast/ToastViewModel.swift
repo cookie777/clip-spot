@@ -121,40 +121,14 @@ final class ToastViewModel {
         let width = appState.toastWidth
         let height = appState.toastHeight
         
-        let x: CGFloat
-        let y: CGFloat
-        
-        switch appState.toastPosition {
-        case .topLeft:
-            x = frame.minX + margin
-            y = frame.maxY - height - margin
-        case .topCenter:
-            x = frame.midX - width / 2
-            y = frame.maxY - height - margin
-        case .topRight:
-            x = frame.maxX - width - margin
-            y = frame.maxY - height - margin
-        case .centerLeft:
-            x = frame.minX + margin
-            y = frame.midY - height / 2
-        case .center:
-            x = frame.midX - width / 2
-            y = frame.midY - height / 2
-        case .centerRight:
-            x = frame.maxX - width - margin
-            y = frame.midY - height / 2
-        case .bottomLeft:
-            x = frame.minX + margin
-            y = frame.minY + margin
-        case .bottomCenter:
-            x = frame.midX - width / 2
-            y = frame.minY + margin
-        case .bottomRight:
-            x = frame.maxX - width - margin
-            y = frame.minY + margin
-        }
+        let position = appState.toastPosition.calculatePosition(
+            frame: frame,
+            width: width,
+            height: height,
+            margin: margin
+        )
 
-        window.setFrameOrigin(NSPoint(x: x, y: y))
+        window.setFrameOrigin(position)
     }
     
     private func cancelWindowAnimations(_ window: NSWindow?) {

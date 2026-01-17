@@ -6,22 +6,20 @@
 //
 
 import SwiftUI
+import Combine
 
 struct SettingToastView : View {
     
     @ObservedObject var appState: AppState
+    @StateObject private var toastPreviewViewModel: ToastPreviewViewModel
+    
+    init(appState: AppState) {
+        self.appState = appState
+        self._toastPreviewViewModel = StateObject(wrappedValue: ToastPreviewViewModel(appState: appState))
+    }
     
     var body: some View {
         Form {
-            Section("Position") {
-                Picker("Position", selection: $appState.toastPosition) {
-                    ForEach(ToastPosition.allCases, id: \.self) { position in
-                        Text(position.displayName).tag(position)
-                    }
-                }
-                .pickerStyle(.menu)
-            }
-
             Section("Animation") {
                 HStack {
                     Text("Display Duration")
@@ -55,6 +53,15 @@ struct SettingToastView : View {
                     .controlSize(.small)
                 ColorPicker("Background Color", selection: $appState.toastBgColor)
                     .controlSize(.small)
+            }
+            
+            Section("Position") {
+                Picker("Position", selection: $appState.toastPosition) {
+                    ForEach(Position.allCases, id: \.self) { position in
+                        Text(position.displayName).tag(position)
+                    }
+                }
+                .pickerStyle(.menu)
             }
             
             Section("Size") {
@@ -112,26 +119,17 @@ struct SettingToastView : View {
                     .toggleStyle(.switch)
             }
 
-            Section("Preview") {
-                HStack {
-                    Spacer(minLength: 0)
-                    VStack {
-                        Spacer(minLength: 20)
-                        ToastView(text: SettingToastView.sampleText, appState: appState)
-                            .padding(appState.toastMargin)
-                    }
-                }
-                .background(
-                    Rectangle()
-                        .fill(Color.black)
-                        .padding(.bottom, 1)
-                        .padding(.trailing, 1)
-                        .background(Color.blue)
-                )
-            }
-
         }
         .formStyle(.grouped)
+        .onAppear {
+            toastPreviewViewModel.showPreview()
+        }
+        .onDisappear {
+            toastPreviewViewModel.hidePreview()
+        }
+        .onReceive(appState.objectWillChange) {_ in
+            toastPreviewViewModel.updatePreview()
+        }
     }
     
     private static let sampleText = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."

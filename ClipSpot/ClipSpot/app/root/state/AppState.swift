@@ -8,32 +8,6 @@
 import SwiftUI
 import Combine
 
-enum ToastPosition: String, CaseIterable, Codable {
-    case topLeft = "topLeft"
-    case topCenter = "topCenter"
-    case topRight = "topRight"
-    case centerLeft = "centerLeft"
-    case center = "center"
-    case centerRight = "centerRight"
-    case bottomLeft = "bottomLeft"
-    case bottomCenter = "bottomCenter"
-    case bottomRight = "bottomRight"
-    
-    var displayName: String {
-        switch self {
-        case .topLeft: return "Top Left"
-        case .topCenter: return "Top Center"
-        case .topRight: return "Top Right"
-        case .centerLeft: return "Center Left"
-        case .center: return "Center"
-        case .centerRight: return "Center Right"
-        case .bottomLeft: return "Bottom Left"
-        case .bottomCenter: return "Bottom Center"
-        case .bottomRight: return "Bottom Right"
-        }
-    }
-}
-
 protocol IAppState: ObservableObject {
     var toastWidth: Double { get set }
     var toastHeight: Double { get set }
@@ -46,7 +20,7 @@ protocol IAppState: ObservableObject {
     var toastShowCopyContent: Bool { get set }
     var toastDisplaySecond: Double { get set }
     var launchAtLogin: Bool { get set }
-    var toastPosition: ToastPosition { get set }
+    var toastPosition: Position { get set }
     
     var monitoringEnabled: Bool { get set }
 
@@ -68,13 +42,13 @@ final class AppState: IAppState {
     @AppStorage("toastShowCopyContent") var toastShowCopyContent: Bool = true
     @AppStorage("toastDisplaySecond") var toastDisplaySecond: Double = 1.0
     @AppStorage("launchAtLogin") var launchAtLogin: Bool = true
-    @AppStorage("toastPosition") private var toastPositionRaw: String = ToastPosition.bottomRight.rawValue
+    @AppStorage("toastPosition") private var toastPositionRaw: String = Position.bottomRight.rawValue
     
     @Published var monitoringEnabled: Bool = true
     
-    var toastPosition: ToastPosition {
+    var toastPosition: Position {
         get {
-            ToastPosition(rawValue: toastPositionRaw) ?? .bottomRight
+            Position(rawValue: toastPositionRaw) ?? .bottomRight
         }
         set {
             toastPositionRaw = newValue.rawValue
@@ -117,7 +91,7 @@ class MockAppState: IAppState {
     var toastShowCopyContent: Bool = true
     var toastDisplaySecond: Double = 1.0
     var launchAtLogin: Bool = true
-    var toastPosition: ToastPosition = .bottomRight
+    var toastPosition: Position = .bottomRight
     
     var monitoringEnabled: Bool = true
 
