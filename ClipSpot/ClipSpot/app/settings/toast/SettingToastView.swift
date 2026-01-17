@@ -13,6 +13,15 @@ struct SettingToastView : View {
     
     var body: some View {
         Form {
+            Section("Position") {
+                Picker("Position", selection: $appState.toastPosition) {
+                    ForEach(ToastPosition.allCases, id: \.self) { position in
+                        Text(position.displayName).tag(position)
+                    }
+                }
+                .pickerStyle(.menu)
+            }
+
             Section("Animation") {
                 HStack {
                     Text("Display Duration")
