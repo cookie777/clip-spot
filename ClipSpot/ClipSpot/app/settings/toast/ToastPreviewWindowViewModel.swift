@@ -13,11 +13,13 @@ import Combine
 final class ToastPreviewWindowViewModel: ObservableObject {
     private var previewWindow: NSWindow?
     private let appState: AppState
+    private let toastViewModel: ToastViewModel
     
     private static let previewText = "This is a preview of how your toast notification will appear. Adjust settings to see changes in real-time."
     
     init(appState: AppState) {
         self.appState = appState
+        self.toastViewModel = ToastViewModel(appState: appState, copyText: Self.previewText)
     }
     
     func showPreview() {
@@ -38,14 +40,14 @@ final class ToastPreviewWindowViewModel: ObservableObject {
               let hosting = window.contentViewController as? NSHostingController<ToastView>
         else { return }
         
-        hosting.rootView = ToastView(text: Self.previewText, appState: appState)
+        hosting.rootView = ToastView(appState: appState, viewModel: toastViewModel)
         positionWindow(window: window)
     }
     
     private func createWindowIfNeeded() {
         guard previewWindow == nil else { return }
         let hosting = NSHostingController(
-            rootView: ToastView(text: Self.previewText, appState: appState)
+            rootView: ToastView(appState: appState, viewModel: toastViewModel)
         )
 
         let window = NSWindow(contentViewController: hosting)

@@ -10,6 +10,7 @@ final class ToastWindowViewModel {
     private let soundService: SoundService
     private let clipboardService: ClipboardService
     private let appState: AppState
+    private let toastViewModel: ToastViewModel
     
     private var toastTask: Task<Void, Never>?
     private var toastWindow: NSWindow?
@@ -22,6 +23,7 @@ final class ToastWindowViewModel {
         self.soundService = soundService
         self.clipboardService = clipboardService
         self.appState = appState
+        self.toastViewModel = ToastViewModel(appState: appState, copyText: "")
     }
 
     func setupClipboardMonitoring() async {
@@ -65,7 +67,7 @@ final class ToastWindowViewModel {
     private func createWindowIfNeeded() {
         guard toastWindow == nil else { return }
         let hosting = NSHostingController(
-            rootView: ToastView(text: "", appState: appState)
+            rootView: ToastView(appState: appState, viewModel: toastViewModel)
         )
 
         let window = NSWindow(contentViewController: hosting)
@@ -86,8 +88,18 @@ final class ToastWindowViewModel {
             let hosting = window.contentViewController as? NSHostingController<ToastView>
         else { return }
 
-        hosting.rootView = ToastView(text: text, appState: appState)
+        hosting.rootView = ToastView(appState: appState, viewModel: toastViewModel)
         positionWindow(window: window)
+        toastViewModel.copyText = text
+//        let size = hosting.view.fittingSize
+//        let maxWidth: CGFloat = appState.toastWidth
+//        let maxHeight: CGFloat = appState.toastHeight
+//
+//        let width = min(size.width, maxWidth)
+//        let height = min(size.height, maxHeight)
+//
+//        window.setContentSize(NSSize(width: width, height: height))
+//        
         window.alphaValue = 0
         window.orderFront(nil)
         await animateWindowAlpha(window: window, to: 1, duration: 0.16)

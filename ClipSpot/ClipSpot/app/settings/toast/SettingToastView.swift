@@ -68,33 +68,33 @@ struct SettingToastView : View {
                 HStack {
                     Text("Width")
                     Text("\(appState.toastWidth, specifier: "%.0f")")
-                    Slider(value: $appState.toastWidth, in: 100...600) {
+                    Slider(value: $appState.toastWidth, in: 100...500) {
                     } minimumValueLabel: {
                         Text("100")
                     } maximumValueLabel: {
-                        Text("600")
+                        Text("500")
                     }
                     .controlSize(.mini)
                 }
                 HStack {
                     Text("Height")
                     Text("\(appState.toastHeight, specifier: "%.0f")")
-                    Slider(value: $appState.toastHeight, in: 50...300) {
+                    Slider(value: $appState.toastHeight, in: 50...120) {
                     } minimumValueLabel: {
                         Text("50")
                     } maximumValueLabel: {
-                        Text("300")
+                        Text("120")
                     }
                     .controlSize(.mini)
                 }
                 HStack {
                     Text("Margin")
                     Text("\(appState.toastMargin, specifier: "%.0f")")
-                    Slider(value: $appState.toastMargin, in: 0...300) {
+                    Slider(value: $appState.toastMargin, in: 0...64) {
                     } minimumValueLabel: {
                         Text("0")
                     } maximumValueLabel: {
-                        Text("300")
+                        Text("64")
                     }
                     .controlSize(.mini)
                 }
