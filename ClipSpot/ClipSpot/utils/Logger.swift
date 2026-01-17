@@ -45,6 +45,6 @@ extension ILogger  {
 }
 
 extension Logger {
-    nonisolated static let shared = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.takayuki.ClipSpot",
+    nonisolated static let shared = Logger(subsystem: Bundle.main.bundleIdentifier ?? "yanmer.com.ClipSpot",
                                category: String(describing: Self.self))
 }
