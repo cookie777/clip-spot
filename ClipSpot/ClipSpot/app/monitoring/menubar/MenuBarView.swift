@@ -10,7 +10,7 @@ struct MenuContentView: View {
     @Environment(\.openSettings) private var openSettings
     @ObservedObject var appState: AppState
     @StateObject private var menuBarViewModel: MenuBarViewModel
-    private var toastViewModel: ToastViewModel
+    private var toastWindowViewModel: ToastWindowViewModel
     
     init(appState: AppState, diContainer: DIContainer) {
         let vm = MenuBarViewModel(
@@ -19,16 +19,16 @@ struct MenuContentView: View {
         )
         self._menuBarViewModel = StateObject(wrappedValue: vm)
         
-        let toastViewModel = ToastViewModel(
+        let toastWindowViewModel = ToastWindowViewModel(
             appState: appState,
             soundService: diContainer.soundService,
             clipboardService: diContainer.clipboardService
         )
         self.appState = appState
-        self.toastViewModel = toastViewModel
+        self.toastWindowViewModel = toastWindowViewModel
         
         Task(priority: .background) {
-            await toastViewModel.setupClipboardMonitoring()
+            await toastWindowViewModel.setupClipboardMonitoring()
         }
     }
     

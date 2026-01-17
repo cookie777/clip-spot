@@ -10,7 +10,7 @@ import AppKit
 import Combine
 
 @MainActor
-final class ToastPreviewViewModel: ObservableObject {
+final class ToastPreviewWindowViewModel: ObservableObject {
     private var previewWindow: NSWindow?
     private let appState: AppState
     

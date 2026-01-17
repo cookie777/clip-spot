@@ -11,11 +11,11 @@ import Combine
 struct SettingToastView : View {
     
     @ObservedObject var appState: AppState
-    @StateObject private var toastPreviewViewModel: ToastPreviewViewModel
+    @StateObject private var toastPreviewWindowViewModel: ToastPreviewWindowViewModel
     
     init(appState: AppState) {
         self.appState = appState
-        self._toastPreviewViewModel = StateObject(wrappedValue: ToastPreviewViewModel(appState: appState))
+        self._toastPreviewWindowViewModel = StateObject(wrappedValue: ToastPreviewWindowViewModel(appState: appState))
     }
     
     var body: some View {
@@ -122,13 +122,13 @@ struct SettingToastView : View {
         }
         .formStyle(.grouped)
         .onAppear {
-            toastPreviewViewModel.showPreview()
+            toastPreviewWindowViewModel.showPreview()
         }
         .onDisappear {
-            toastPreviewViewModel.hidePreview()
+            toastPreviewWindowViewModel.hidePreview()
         }
         .onReceive(appState.objectWillChange) {_ in
-            toastPreviewViewModel.updatePreview()
+            toastPreviewWindowViewModel.updatePreview()
         }
     }
     

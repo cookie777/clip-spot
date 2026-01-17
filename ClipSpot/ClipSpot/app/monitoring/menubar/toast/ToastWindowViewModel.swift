@@ -3,7 +3,7 @@ import AppKit
 import Combine
 
 @MainActor
-final class ToastViewModel {
+final class ToastWindowViewModel {
 
     var toastText: String = ""
 
