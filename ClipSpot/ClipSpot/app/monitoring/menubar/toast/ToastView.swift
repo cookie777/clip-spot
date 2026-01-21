@@ -41,27 +41,28 @@ struct ToastView: View {
             Spacer(minLength: 0)
                 .renderIf(appState.toastPosition.isTop)
         }
-        .opacity(appState.toastOpacity)
         .frame(width: appState.toastWidth, height: appState.toastHeight)
     }
 }
 
 #Preview {
     let appState = AppState()
-    ToastView(appState: appState, viewModel: ToastViewModel(appState: appState, copyText: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."))
-        .onAppear {
-            appState.toastShowTitle = true
-            appState.toastShowCopyContent = false
+    VStack {
+        ToastView(appState: appState, viewModel: ToastViewModel(appState: appState, copyText: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."))
+            .onAppear {
+                appState.toastShowTitle = true
+                appState.toastShowCopyContent = false
+            }
+        
+        ToastView(appState: appState, viewModel: ToastViewModel(appState: appState, copyText: "Lorem Ipsum"))
+            .onAppear {
+                appState.toastShowTitle = true
+                appState.toastShowCopyContent = false
+            }
+        
+        Button("toggle title") {
+            appState.toastShowTitle.toggle()
         }
-    
-    ToastView(appState: appState, viewModel: ToastViewModel(appState: appState, copyText: "Lorem Ipsum"))
-        .onAppear {
-            appState.toastShowTitle = true
-            appState.toastShowCopyContent = false
-        }
-    
-    Button("toggle title") {
-        appState.toastShowTitle.toggle()
     }
-
+    .background(Color.blue)
 }

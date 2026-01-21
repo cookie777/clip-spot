@@ -9,7 +9,7 @@ import SwiftUI
 import Combine
 
 struct SettingToastView : View {
-    
+    @Environment(\.appearsActive) var appearsActive
     @ObservedObject var appState: AppState
     @StateObject private var toastPreviewWindowViewModel: ToastPreviewWindowViewModel
     
@@ -37,18 +37,6 @@ struct SettingToastView : View {
             }
 
             Section("Color") {
-                HStack {
-                    Text("Opacity")
-                    Text("\(appState.toastOpacity * 100, specifier: "%.0f")")
-                        .opacity(0.8)
-                    Slider(value: $appState.toastOpacity, in: 0.0...1) {
-                    } minimumValueLabel: {
-                        Text("0")
-                    } maximumValueLabel: {
-                        Text("100")
-                    }
-                    .controlSize(.mini)
-                }
                 ColorPicker("Text Color", selection: $appState.toastTextColor)
                     .controlSize(.small)
                 ColorPicker("Background Color", selection: $appState.toastBgColor)
@@ -61,7 +49,7 @@ struct SettingToastView : View {
                         Text(position.displayName).tag(position)
                     }
                 }
-                .pickerStyle(.menu)
+                .pickerStyle(.automatic)
             }
             
             Section("Size") {
@@ -86,11 +74,11 @@ struct SettingToastView : View {
                 HStack {
                     Text("Height")
                     Text("\(appState.toastHeight, specifier: "%.0f")")
-                    Slider(value: $appState.toastHeight, in: 50...120) {
+                    Slider(value: $appState.toastHeight, in: 50...240) {
                     } minimumValueLabel: {
                         Text("50")
                     } maximumValueLabel: {
-                        Text("120")
+                        Text("240")
                     }
                     .controlSize(.mini)
                 }
@@ -129,13 +117,22 @@ struct SettingToastView : View {
         }
         .formStyle(.grouped)
         .onAppear {
+            print("appera")
             toastPreviewWindowViewModel.showPreview()
         }
         .onDisappear {
+            print("diss")
             toastPreviewWindowViewModel.hidePreview()
         }
         .onReceive(appState.objectWillChange) {_ in
             toastPreviewWindowViewModel.updatePreview()
+        }
+        .onChange(of: appearsActive) { _, newValue in
+            if newValue {
+                toastPreviewWindowViewModel.showPreview()
+            } else {
+                toastPreviewWindowViewModel.hidePreview()
+            }
         }
     }
     

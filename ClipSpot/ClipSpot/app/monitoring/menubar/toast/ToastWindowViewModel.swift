@@ -76,7 +76,7 @@ final class ToastWindowViewModel {
         window.backgroundColor = .clear
         window.level = .floating
         window.ignoresMouseEvents = true
-        window.hasShadow = true
+        window.hasShadow = false
         window.alphaValue = 0
 
         toastWindow = window

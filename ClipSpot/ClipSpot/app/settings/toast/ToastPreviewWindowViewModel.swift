@@ -56,7 +56,7 @@ final class ToastPreviewWindowViewModel: ObservableObject {
         window.backgroundColor = .clear
         window.level = .floating
         window.ignoresMouseEvents = true
-        window.hasShadow = true
+        window.hasShadow = false
         window.alphaValue = 1
 
         previewWindow = window

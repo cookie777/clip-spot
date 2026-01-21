@@ -11,7 +11,6 @@ import Combine
 protocol IAppState: ObservableObject {
     var toastWidth: Double { get set }
     var toastHeight: Double { get set }
-    var toastOpacity: Double { get set }
     var soundName: String { get set }
     var soundVolume: Double { get set }
     var toastMargin: Double { get set }
@@ -31,7 +30,6 @@ protocol IAppState: ObservableObject {
 final class AppState: IAppState {
     @AppStorage("toastWidth") var toastWidth: Double = 400
     @AppStorage("toastHeight") var toastHeight: Double = 160
-    @AppStorage("toastOpacity") var toastOpacity: Double = 0.9
     @AppStorage("soundName") var soundName: String = "Blow"
     @AppStorage("soundVolume") var soundVolume: Double = 0.5
     @AppStorage("toastBackgroundColorData") private var toastBackgroundColorData: Data?
@@ -49,7 +47,7 @@ final class AppState: IAppState {
     
     var toastPosition: Position {
         get {
-            Position(rawValue: toastPositionRaw) ?? .bottomRight
+            Position(rawValue: toastPositionRaw) ?? .center
         }
         set {
             toastPositionRaw = newValue.rawValue
