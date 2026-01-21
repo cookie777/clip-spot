@@ -13,27 +13,36 @@ struct ToastView: View {
 
     var body: some View {
         VStack {
-            if appState.toastShowTitle {
-                HStack {
+            Spacer(minLength: 0)
+                .renderIf(appState.toastPosition.isBottom)
+            HStack {
+                Spacer(minLength: 0)
+                    .renderIf(appState.toastPosition.isRight)
+                VStack {
                     Text("Copied to Clipboard")
                         .foregroundStyle(appState.toastTextColor.opacity(0.4))
                         .font(.caption.bold())
-                    Spacer()
+                        .renderIf(appState.toastShowTitle)
+                    Text(viewModel.copyText)
+                        .foregroundStyle(appState.toastTextColor)
+                        .font(.system(size: appState.toastFontSize))
                 }
-            }
-            VStack {
+                .padding(12)
+                .applyIf(!appState.toastDynamicSize){
+                    $0.frame(width: appState.toastWidth, height: appState.toastHeight)
+                }
+                .background(appState.toastBgColor)
+                .cornerRadius(12)
+                
+                
                 Spacer(minLength: 0)
-                Text(viewModel.copyText)
-                    .foregroundStyle(appState.toastTextColor)
-                    .font(.system(size: appState.toastFontSize))
-                Spacer(minLength: 0)
+                    .renderIf(appState.toastPosition.isLeft)
             }
+            Spacer(minLength: 0)
+                .renderIf(appState.toastPosition.isTop)
         }
-        .padding(12)
-        .frame(width: appState.toastWidth, height: appState.toastHeight)
-        .background(appState.toastBgColor)
-        .cornerRadius(12)
         .opacity(appState.toastOpacity)
+        .frame(width: appState.toastWidth, height: appState.toastHeight)
     }
 }
 
@@ -45,7 +54,14 @@ struct ToastView: View {
             appState.toastShowCopyContent = false
         }
     
+    ToastView(appState: appState, viewModel: ToastViewModel(appState: appState, copyText: "Lorem Ipsum"))
+        .onAppear {
+            appState.toastShowTitle = true
+            appState.toastShowCopyContent = false
+        }
+    
     Button("toggle title") {
         appState.toastShowTitle.toggle()
     }
+
 }

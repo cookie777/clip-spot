@@ -65,6 +65,13 @@ struct SettingToastView : View {
             }
             
             Section("Size") {
+                VStack(alignment: .leading) {
+                    Toggle("Dynamic Size", isOn: $appState.toastDynamicSize)
+                        .toggleStyle(.switch)
+                    Text("Dynamically resize toast based on text, within width and height limits.")
+                        .foregroundStyle(.secondary)
+                }
+                
                 HStack {
                     Text("Width")
                     Text("\(appState.toastWidth, specifier: "%.0f")")

@@ -91,15 +91,6 @@ final class ToastWindowViewModel {
         hosting.rootView = ToastView(appState: appState, viewModel: toastViewModel)
         positionWindow(window: window)
         toastViewModel.copyText = text
-//        let size = hosting.view.fittingSize
-//        let maxWidth: CGFloat = appState.toastWidth
-//        let maxHeight: CGFloat = appState.toastHeight
-//
-//        let width = min(size.width, maxWidth)
-//        let height = min(size.height, maxHeight)
-//
-//        window.setContentSize(NSSize(width: width, height: height))
-//        
         window.alphaValue = 0
         window.orderFront(nil)
         await animateWindowAlpha(window: window, to: 1, duration: 0.16)

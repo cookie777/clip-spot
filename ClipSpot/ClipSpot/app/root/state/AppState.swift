@@ -43,6 +43,7 @@ final class AppState: IAppState {
     @AppStorage("toastDisplaySecond") var toastDisplaySecond: Double = 1.0
     @AppStorage("launchAtLogin") var launchAtLogin: Bool = true
     @AppStorage("toastPosition") private var toastPositionRaw: String = Position.bottomRight.rawValue
+    @AppStorage("toastDynamicSize") var toastDynamicSize: Bool = true
     
     @Published var monitoringEnabled: Bool = true
     

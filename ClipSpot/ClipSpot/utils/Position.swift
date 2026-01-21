@@ -72,4 +72,20 @@ enum Position: String, CaseIterable, Codable {
         
         return NSPoint(x: x, y: y)
     }
+    
+    var isLeft: Bool {
+        return self == .topLeft || self == .centerLeft || self == .bottomLeft
+    }
+    
+    var isRight: Bool {
+        return self == .topRight || self == .centerRight || self == .bottomRight
+    }
+    
+    var isTop: Bool {
+        return self == .topLeft || self == .topCenter || self == .topRight
+    }
+    
+    var isBottom: Bool {
+        return self == .bottomRight || self == .bottomCenter || self == .bottomLeft
+    }
 }
