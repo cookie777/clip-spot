@@ -39,7 +39,7 @@ final class AppState: IAppState {
     @AppStorage("toastShowTitle") var toastShowTitle: Bool = true
     @AppStorage("toastShowCopyContent") var toastShowCopyContent: Bool = true
     @AppStorage("toastDisplaySecond") var toastDisplaySecond: Double = 1.0
-    @AppStorage("launchAtLogin") var launchAtLogin: Bool = true
+    @AppStorage("launchAtLogin") var launchAtLogin: Bool = false
     @AppStorage("toastPosition") private var toastPositionRaw: String = Position.bottomRight.rawValue
     @AppStorage("toastDynamicSize") var toastDynamicSize: Bool = true
     

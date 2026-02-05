@@ -14,6 +14,7 @@ struct ClipSpotApp: App {
     private let diContainer: DIContainer = DIContainer()
 
 
+
     var body: some Scene {
         MenuBarExtra("CopyAlert", systemImage: "doc.on.doc") {
             MenuContentView(appState: appState, diContainer: diContainer)
